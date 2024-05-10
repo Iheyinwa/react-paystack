@@ -8,7 +8,7 @@ const App = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
     reset,
   } = useForm();
 
@@ -25,9 +25,11 @@ const App = () => {
     catch(e){
       console.log("Error Submitting information: ", errors)
     }
+
+    const paystackKey = import.meta.env.VITE_PUBLIC_KEY
     const paystack = new PaystackPop();
     paystack.newTransaction({
-      key: "pk_test_329bae1515829f5cc3ecb279536da5476e395dda",
+      key: paystackKey,
       email: data.email,
       amount: 100 * 100,
 
@@ -58,9 +60,12 @@ const App = () => {
     <>
       <section className="form-wrapper">
         <div className="todo">
+
           <h1 className="header">Contact Us</h1>
 
-          <section>
+
+          <section className="form-container">
+            
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="form-control">
                 <label>
@@ -126,7 +131,7 @@ const App = () => {
                 )}
               </div>
               <div className="btn-container">
-              <button type="Submit" className="btn">Submit</button>
+              <button type="Submit" className="btn" disabled={!isValid}>Submit</button>
               </div>
             </form>
           </section>
