@@ -2,10 +2,10 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
-const apikey = import.meta.env.VITE_API_KEY
+// const apikey = import.meta.env.VITE_API_KEY
 
 const firebaseConfig = {
-  apiKey: apikey,
+  apiKey: "AIzaSyAlqm8i8JjFwLZi_2XUyyOfOm_ZFWiV4Yg",
   authDomain: "reacthookform-31c10.firebaseapp.com",
   projectId: "reacthookform-31c10",
   storageBucket: "reacthookform-31c10.appspot.com",
