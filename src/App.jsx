@@ -1,8 +1,11 @@
 import "./App.css";
 import { useForm } from "react-hook-form";
 import PaystackPop from "@paystack/inline-js";
-import { collection, addDoc} from "firebase/firestore";
-import { db } from "./firebase";
+// import { collection, addDoc} from "firebase/firestore";
+// import { db } from "./firebase";
+import { LoadingOutlined } from "@ant-design/icons";
+import { Alert, Spin } from "antd";
+import { useState } from "react";
 
 const App = () => {
   const {
@@ -12,32 +15,39 @@ const App = () => {
     reset,
   } = useForm();
 
-
+   const [isSubmitting, setIsSubmitting] = useState(false);
+   const [isSuccess, setIsSuccess] = useState(false);
+   const [isCancel, setIsCancel] = useState(false);
   const onSubmit = async (data) => {
     console.log(data)
+    setIsSubmitting(true);
     
-    try {
-      const userDataRef = await addDoc(collection(db, "userData"), {
-        userData: data
-      });
-      console.log("User Data written with ID: ", userDataRef);
-    }
-    catch(e){
-      console.log("Error Submitting information: ", errors)
-    }
+    // try {
+    //   const userDataRef = await addDoc(collection(db, "userData"), {
+    //     userData: data
+    //   });
+    //   console.log("User Data written with ID: ", userDataRef);
+    // }
+    // catch(e){
+    //   console.log("Error Submitting information: ", errors)
+    // }
 
-    // const paystackKey = import.meta.env.VITE_PUBLIC_KEY
+    const paystackKey = import.meta.env.VITE_PUBLIC_KEY
     const paystack = new PaystackPop();
     paystack.newTransaction({
-      key: "pk_test_329bae1515829f5cc3ecb279536da5476e395dda",
+      key: paystackKey,
       email: data.email,
       amount: 100 * 100,
 
-      onSuccess: (transaction) => {
-        alert(`Payment successful reference ${transaction.reference}`);
+      onSuccess: () => {
+        // alert(`Payment successful reference ${transaction.reference}`);
+        setIsSuccess(true);
+        setIsSubmitting(false);
       },
       onCancel: () => {
-        alert("You  didn't complete the transaction");
+        // alert("You  didn't complete the transaction");
+        setIsCancel(true);
+         setIsSubmitting(false);
       },
     });
     reset();
@@ -58,14 +68,31 @@ const App = () => {
 
   return (
     <>
+      {isSuccess && (
+        <Alert
+          message="Successful"
+          description={"Transaction Completed Successfully"}
+          type="success"
+          showIcon
+          direction
+          closable
+        />
+      )}
+      {isCancel && (
+        <Alert
+          message="Warning"
+          description="You didn't complete the transaction"
+          type="warning"
+          showIcon
+          closable
+        />
+      )}
       <section className="form-wrapper">
         <div className="todo">
-
           <h1 className="header">Contact Us</h1>
-
-
+          <hr />
           <section className="form-container">
-            
+            <p>Please fill in your details</p>
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="form-control">
                 <label>
@@ -102,7 +129,7 @@ const App = () => {
                   Email <span>*</span>
                 </label>
                 <input
-                  type="text"
+                  type="email"
                   name="email"
                   {...register("email", {
                     required: "Email is required",
@@ -112,7 +139,9 @@ const App = () => {
                     },
                   })}
                 />
-                {errors.email && <p className="errors">{errors.email.message}</p>}
+                {errors.email && (
+                  <p className="errors">{errors.email.message}</p>
+                )}
               </div>
               <div className="form-control">
                 <label>
@@ -131,7 +160,22 @@ const App = () => {
                 )}
               </div>
               <div className="btn-container">
-              <button type="Submit" className="btn" disabled={!isValid}>Submit</button>
+                <button type="Submit" className={`btn`} disabled={!isValid}>
+                  {isSubmitting ? (
+                    <Spin
+                      indicator={
+                        <LoadingOutlined
+                          style={{
+                            fontSize: 24,
+                          }}
+                          spin
+                        />
+                      }
+                    />
+                  ) : (
+                    <span>Submit</span>
+                  )}
+                </button>
               </div>
             </form>
           </section>
